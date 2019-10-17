@@ -1,35 +1,27 @@
 package top.crossoverjie.cicada.server.configuration;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Properties;
 
 /**
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/9/8 16:28
+ * Date: 2018/9/8 16:28
  * @since JDK 1.8
  */
 public abstract class AbstractCicadaConfiguration {
-
     /**
      * file name
      */
+    @Setter
+    @Getter
     private String propertiesName;
 
+    @Setter
     private Properties properties;
-
-
-    public void setPropertiesName(String propertiesName) {
-        this.propertiesName = propertiesName;
-    }
-
-    public String getPropertiesName() {
-        return propertiesName;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
 
     public String get(String key) {
         return properties.get(key) == null ? null : properties.get(key).toString();

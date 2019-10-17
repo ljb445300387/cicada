@@ -14,76 +14,47 @@ import java.util.Map;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/10/21 18:42
+ * Date: 2018/10/21 18:42
  * @since JDK 1.8
  */
 public class InterceptProcess {
 
-    private InterceptProcess(){}
+    private InterceptProcess() {
+    }
 
-    private volatile static InterceptProcess process ;
+    private static InterceptProcess process = new InterceptProcess();
 
-    private static List<CicadaInterceptor> interceptors ;
+    private static List<BaseCicadaInterceptor> interceptors = new ArrayList<>(10);
 
     private AppConfig appConfig = AppConfig.getInstance();
 
-    /**
-     * get single Instance
-     * @return
-     */
-    public static InterceptProcess getInstance(){
-        if (process == null){
-            synchronized (InterceptProcess.class){
-                if (process == null){
-                    process = new InterceptProcess() ;
-                }
-            }
-        }
-        return process ;
+    public static InterceptProcess getInstance() {
+        return process;
     }
-
 
     public void loadInterceptors() throws Exception {
-
-        if (interceptors != null){
-            return;
-        }else {
-            interceptors = new ArrayList<>(10) ;
-            Map<Class<?>, Integer> cicadaInterceptor = ClassScanner.getCicadaInterceptor(appConfig.getRootPackageName());
-            for (Map.Entry<Class<?>, Integer> classEntry : cicadaInterceptor.entrySet()) {
-                Class<?> interceptorClass = classEntry.getKey();
-                CicadaInterceptor interceptor = (CicadaInterceptor) interceptorClass.newInstance();
-                interceptor.setOrder(classEntry.getValue());
-                interceptors.add(interceptor);
-            }
-            Collections.sort(interceptors,new OrderComparator());
+        Map<Class<?>, Integer> map = ClassScanner.getCicadaInterceptor(appConfig.getRootPackageName());
+        for (Map.Entry<Class<?>, Integer> classEntry : map.entrySet()) {
+            Class<?> interceptorClass = classEntry.getKey();
+            BaseCicadaInterceptor interceptor = (BaseCicadaInterceptor) interceptorClass.newInstance();
+            interceptor.setOrder(classEntry.getValue());
+            interceptors.add(interceptor);
         }
+        Collections.sort(interceptors, new OrderComparator());
     }
 
-
-    /**
-     * execute before
-     * @param param
-     * @throws Exception
-     */
     public boolean processBefore(Param param) throws Exception {
-        for (CicadaInterceptor interceptor : interceptors) {
-            boolean access = interceptor.before(CicadaContext.getContext(), param);
-            if (!access){
-                return access ;
+        for (BaseCicadaInterceptor interceptor : interceptors) {
+            if (!interceptor.before(CicadaContext.getContext(), param)) {
+                return false;
             }
         }
         return true;
     }
 
-    /**
-     * execute after
-     * @param param
-     * @throws Exception
-     */
-    public void processAfter(Param param) throws Exception{
-        for (CicadaInterceptor interceptor : interceptors) {
-            interceptor.after(CicadaContext.getContext(),param) ;
+    public void processAfter(Param param) throws Exception {
+        for (BaseCicadaInterceptor interceptor : interceptors) {
+            interceptor.after(CicadaContext.getContext(), param);
         }
     }
 }

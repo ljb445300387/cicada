@@ -8,7 +8,7 @@ public class ClassScannerTest {
     @Test
     public void getCicadaClasses() throws Exception {
         Set<Class<?>> classes = ClassScanner.getClasses("top.crossoverjie.cicada");
-        System.out.println(classes.size());
+        System.out.println(classes);
     }
 
 }

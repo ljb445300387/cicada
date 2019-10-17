@@ -7,8 +7,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import org.slf4j.Logger;
-import top.crossoverjie.cicada.base.log.LoggerBuilder;
+import lombok.extern.slf4j.Slf4j;
 import top.crossoverjie.cicada.server.bean.CicadaBeanManager;
 import top.crossoverjie.cicada.server.config.AppConfig;
 import top.crossoverjie.cicada.server.configuration.ApplicationConfiguration;
@@ -25,23 +24,16 @@ import static top.crossoverjie.cicada.server.constant.CicadaConstant.SystemPrope
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/9/10 21:56
+ * Date: 2018/9/10 21:56
  * @since JDK 1.8
  */
+@Slf4j
 public class NettyBootStrap {
+    private static AppConfig appConfig = AppConfig.getInstance();
+    private static EventLoopGroup boss = new NioEventLoopGroup(1, new DefaultThreadFactory("boss"));
+    private static EventLoopGroup work = new NioEventLoopGroup(0, new DefaultThreadFactory(APPLICATION_THREAD_WORK_NAME));
+    private static Channel channel;
 
-    private final static Logger LOGGER = LoggerBuilder.getLogger(NettyBootStrap.class);
-
-    private static AppConfig appConfig = AppConfig.getInstance() ;
-    private static EventLoopGroup boss = new NioEventLoopGroup(1,new DefaultThreadFactory("boss"));
-    private static EventLoopGroup work = new NioEventLoopGroup(0,new DefaultThreadFactory(APPLICATION_THREAD_WORK_NAME));
-    private static Channel channel ;
-
-    /**
-     * Start netty Server
-     *
-     * @throws Exception
-     */
     public static void startCicada() throws Exception {
         // start
         startServer();
@@ -53,10 +45,6 @@ public class NettyBootStrap {
         joinServer();
     }
 
-    /**
-     * start netty server
-     * @throws InterruptedException
-     */
     private static void startServer() throws InterruptedException {
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(boss, work)
@@ -78,23 +66,16 @@ public class NettyBootStrap {
         Long start = ThreadLocalHolder.getLocalTime();
         ApplicationConfiguration applicationConfiguration = (ApplicationConfiguration) getConfiguration(ApplicationConfiguration.class);
         long end = System.currentTimeMillis();
-        LOGGER.info("Cicada started on port: {}.cost {}ms", applicationConfiguration.get(CicadaConstant.CICADA_PORT), end - start);
-        LOGGER.info(">> access http://{}:{}{} <<","127.0.0.1",appConfig.getPort(),appConfig.getRootPath());
+        log.info("Cicada started on port: {}.cost {}ms", applicationConfiguration.get(CicadaConstant.CICADA_PORT), end - start);
+        log.info(">> access http://{}:{}{} <<", "127.0.0.1", appConfig.getPort(), appConfig.getRootPath());
     }
 
     /**
      * shutdown server
      */
     private static void shutDownServer() {
-        ShutDownThread shutDownThread = new ShutDownThread();
-        shutDownThread.setName(APPLICATION_THREAD_SHUTDOWN_NAME);
-        Runtime.getRuntime().addShutdownHook(shutDownThread);
-    }
-
-    private static class ShutDownThread extends Thread {
-        @Override
-        public void run() {
-            LOGGER.info("Cicada server stop...");
+        Thread shutDownThread = new Thread(() -> {
+            log.info("Cicada server stop...");
             CicadaContext.removeContext();
 
             CicadaBeanManager.getInstance().releaseBean();
@@ -102,8 +83,10 @@ public class NettyBootStrap {
             boss.shutdownGracefully();
             work.shutdownGracefully();
 
-            LOGGER.info("Cicada server has been successfully stopped.");
-        }
-
+            log.info("Cicada server has been successfully stopped.");
+        });
+        shutDownThread.setName(APPLICATION_THREAD_SHUTDOWN_NAME);
+        Runtime.getRuntime().addShutdownHook(shutDownThread);
     }
+
 }

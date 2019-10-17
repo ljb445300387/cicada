@@ -5,7 +5,7 @@ import top.crossoverjie.cicada.base.log.LoggerBuilder;
 import top.crossoverjie.cicada.server.action.param.Param;
 import top.crossoverjie.cicada.server.annotation.Interceptor;
 import top.crossoverjie.cicada.server.context.CicadaContext;
-import top.crossoverjie.cicada.server.intercept.CicadaInterceptor;
+import top.crossoverjie.cicada.server.intercept.BaseCicadaInterceptor;
 
 /**
  * Function:
@@ -15,9 +15,9 @@ import top.crossoverjie.cicada.server.intercept.CicadaInterceptor;
  * @since JDK 1.8
  */
 @Interceptor(order = 1)
-public class ExecuteTimeInterceptor extends CicadaInterceptor {
+public class ExecuteTimeInterceptorBase extends BaseCicadaInterceptor {
 
-    private static final Logger LOGGER = LoggerBuilder.getLogger(ExecuteTimeInterceptor.class);
+    private static final Logger LOGGER = LoggerBuilder.getLogger(ExecuteTimeInterceptorBase.class);
 
     private Long start;
 

@@ -7,12 +7,10 @@ import top.crossoverjie.cicada.server.enums.StatusEnum;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/8/25 15:26
+ * Date: 2018/8/25 15:26
  * @since JDK 1.8
  */
 public class CicadaException extends GenericException {
-
-
     public CicadaException(String errorCode, String errorMessage) {
         super(errorMessage);
         this.errorCode = errorCode;
@@ -32,7 +30,7 @@ public class CicadaException extends GenericException {
 
     public CicadaException(StatusEnum statusEnum) {
         super(statusEnum.getMessage());
-        this.errorMessage = statusEnum.message();
+        this.errorMessage = statusEnum.getMessage();
         this.errorCode = statusEnum.getCode();
     }
 

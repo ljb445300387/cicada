@@ -10,7 +10,7 @@ import top.crossoverjie.cicada.server.context.CicadaContext;
  *         Date: 2018/9/2 15:40
  * @since JDK 1.8
  */
-public abstract class AbstractCicadaInterceptorAdapter extends CicadaInterceptor{
+public abstract class AbstractBaseCicadaInterceptorAdapter extends BaseCicadaInterceptor {
 
     @Override
     public boolean before(CicadaContext context, Param param) {

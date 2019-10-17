@@ -24,7 +24,7 @@ import static top.crossoverjie.cicada.server.constant.CicadaConstant.SystemPrope
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/9/10 20:29
+ * Date: 2018/9/10 20:29
  * @since JDK 1.8
  */
 public final class CicadaSetting {
@@ -35,10 +35,6 @@ public final class CicadaSetting {
      * @throws Exception
      */
     public static void setting(Class<?> clazz, String rootPath) throws Exception {
-
-        // Cicada logo
-        logo();
-
         //Initialize the application configuration
         initConfiguration(clazz);
 
@@ -52,7 +48,7 @@ public final class CicadaSetting {
 
     private static void logo() {
         System.out.println(LOGO);
-        Thread.currentThread().setName(APPLICATION_THREAD_MAIN_NAME) ;
+        Thread.currentThread().setName(APPLICATION_THREAD_MAIN_NAME);
     }
 
 
@@ -95,7 +91,7 @@ public final class CicadaSetting {
             AbstractCicadaConfiguration conf = (AbstractCicadaConfiguration) aClass.newInstance();
 
             // First read
-            InputStream stream ;
+            InputStream stream;
             String systemProperty = System.getProperty(conf.getPropertiesName());
             if (systemProperty != null) {
                 stream = new FileInputStream(new File(systemProperty));

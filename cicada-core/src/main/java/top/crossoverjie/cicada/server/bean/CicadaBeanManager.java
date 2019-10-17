@@ -1,5 +1,6 @@
 package top.crossoverjie.cicada.server.bean;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import top.crossoverjie.cicada.base.bean.CicadaBeanFactory;
 import top.crossoverjie.cicada.base.log.LoggerBuilder;
@@ -12,20 +13,19 @@ import java.util.Map;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/11/14 01:41
+ * Date: 2018/11/14 01:41
  * @since JDK 1.8
  */
+@Slf4j
 public final class CicadaBeanManager {
-    private final static Logger LOGGER = LoggerBuilder.getLogger(CicadaBeanManager.class);
-
-    private CicadaBeanManager(){
+    private CicadaBeanManager() {
     }
 
     private static volatile CicadaBeanManager cicadaBeanManager;
 
-    private static CicadaBeanFactory cicadaBeanFactory ;
+    private static CicadaBeanFactory cicadaBeanFactory;
 
-    private GlobalHandelException handelException ;
+    private GlobalHandelException handelException;
 
     public static CicadaBeanManager getInstance() {
         if (cicadaBeanManager == null) {
@@ -40,6 +40,7 @@ public final class CicadaBeanManager {
 
     /**
      * initBean route bean factory
+     *
      * @param packageName
      * @throws Exception
      */
@@ -47,14 +48,14 @@ public final class CicadaBeanManager {
         Map<String, Class<?>> cicadaBean = ClassScanner.getCicadaBean(packageName);
 
         Class<?> bean = ClassScanner.getBeanFactory();
-        cicadaBeanFactory = (CicadaBeanFactory) bean.newInstance() ;
+        cicadaBeanFactory = (CicadaBeanFactory) bean.newInstance();
 
         for (Map.Entry<String, Class<?>> classEntry : cicadaBean.entrySet()) {
             Object instance = classEntry.getValue().newInstance();
-            cicadaBeanFactory.register(instance) ;
+            cicadaBeanFactory.register(instance);
 
             //set exception handle
-            if (ClassScanner.isInterface(classEntry.getValue(), GlobalHandelException.class)){
+            if (ClassScanner.isInterface(classEntry.getValue(), GlobalHandelException.class)) {
                 GlobalHandelException exception = (GlobalHandelException) instance;
                 CicadaBeanManager.getInstance().exceptionHandle(exception);
             }
@@ -65,21 +66,21 @@ public final class CicadaBeanManager {
 
     /**
      * get route bean
+     *
      * @param name
      * @return
      * @throws Exception
      */
     public Object getBean(String name) {
         try {
-            return cicadaBeanFactory.getBean(name) ;
+            return cicadaBeanFactory.getBean(name);
         } catch (Exception e) {
-            LOGGER.error("get bean error",e);
+            log.error("get bean error", e);
         }
-        return null ;
+        return null;
     }
 
     /**
-     *
      * @param clazz
      * @param <T>
      * @return
@@ -87,25 +88,25 @@ public final class CicadaBeanManager {
      */
     public <T> T getBean(Class<T> clazz) {
         try {
-            return cicadaBeanFactory.getBean(clazz) ;
+            return cicadaBeanFactory.getBean(clazz);
         } catch (Exception e) {
-            LOGGER.error("get bean error",e);
+            log.error("get bean error", e);
         }
-        return null ;
+        return null;
     }
 
     /**
      * release all beans
      */
-    public void releaseBean(){
+    public void releaseBean() {
         cicadaBeanFactory.releaseBean();
     }
 
-    public void exceptionHandle(GlobalHandelException ex){
-        handelException = ex ;
+    public void exceptionHandle(GlobalHandelException ex) {
+        handelException = ex;
     }
 
-    public GlobalHandelException exceptionHandle(){
-        return handelException ;
+    public GlobalHandelException exceptionHandle() {
+        return handelException;
     }
 }

@@ -7,6 +7,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CicadaAction {
-
-    String value() default "" ;
+    String value() default "";
 }
