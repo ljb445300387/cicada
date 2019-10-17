@@ -31,77 +31,48 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+import static io.netty.handler.codec.http.cookie.ServerCookieEncoder.LAX;
+
 /**
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/8/30 18:47
+ * Date: 2018/8/30 18:47
  * @since JDK 1.8
  */
 @ChannelHandler.Sharable
-public final class HttpDispatcher extends SimpleChannelInboundHandler<DefaultHttpRequest> {
-
-    private static final Logger LOGGER = LoggerBuilder.getLogger(HttpDispatcher.class);
-
+public final class HttpDispatcherHandler extends SimpleChannelInboundHandler<DefaultHttpRequest> {
     private final AppConfig appConfig = AppConfig.getInstance();
     private final InterceptProcess interceptProcess = InterceptProcess.getInstance();
     private final RouterScanner routerScanner = RouterScanner.getInstance();
-    private final RouteProcess routeProcess = RouteProcess.getInstance() ;
-    private final CicadaBeanManager cicadaBeanManager = CicadaBeanManager.getInstance() ;
-    private final GlobalHandelException exceptionHandle = cicadaBeanManager.exceptionHandle() ;
-    private Exception exception ;
+    private final RouteProcess routeProcess = RouteProcess.getInstance();
+    private final CicadaBeanManager cicadaBeanManager = CicadaBeanManager.getInstance();
+    private final GlobalHandelException exceptionHandle = cicadaBeanManager.exceptionHandle();
+    private Exception exception;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, DefaultHttpRequest httpRequest) {
 
         CicadaRequest cicadaRequest = CicadaHttpRequest.init(httpRequest);
         CicadaResponse cicadaResponse = CicadaHttpResponse.init();
-
-        // set current thread request and response
         CicadaContext.setContext(new CicadaContext(cicadaRequest, cicadaResponse));
-
         try {
-            // request uri
             String uri = cicadaRequest.getUrl();
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(URLDecoder.decode(httpRequest.uri(), "utf-8"));
-
-            // check Root Path
             appConfig.checkRootPath(uri, queryStringDecoder);
-
-            // route Action
-            //Class<?> actionClazz = routeAction(queryStringDecoder, appConfig);
-
-            //build paramMap
             Param paramMap = buildParamMap(queryStringDecoder);
-
-            //load interceptors
             interceptProcess.loadInterceptors();
-
-            //interceptor before
-            boolean access = interceptProcess.processBefore(paramMap);
-            if (!access) {
+            if (!interceptProcess.processBefore(paramMap)) {
                 return;
             }
-
-            // execute Method
             Method method = routerScanner.routeMethod(queryStringDecoder);
-            routeProcess.invoke(method,queryStringDecoder) ;
-
-
-            //WorkAction action = (WorkAction) actionClazz.newInstance();
-            //action.execute(CicadaContext.getContext(), paramMap);
-
-
-            // interceptor after
+            routeProcess.invoke(method, queryStringDecoder);
             interceptProcess.processAfter(paramMap);
 
         } catch (Exception e) {
             exceptionCaught(ctx, e);
         } finally {
-            // Response
             responseContent(ctx);
-
-            // remove cicada thread context
             CicadaContext.removeContext();
         }
 
@@ -116,7 +87,7 @@ public final class HttpDispatcher extends SimpleChannelInboundHandler<DefaultHtt
      */
     private void responseContent(ChannelHandlerContext ctx) {
         CicadaResponse cicadaResponse = CicadaContext.getResponse();
-        String context = cicadaResponse.getHttpContent() ;
+        String context = cicadaResponse.getHttpContent();
 
         ByteBuf buf = Unpooled.wrappedBuffer(context.getBytes(StandardCharsets.UTF_8));
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buf);
@@ -142,17 +113,15 @@ public final class HttpDispatcher extends SimpleChannelInboundHandler<DefaultHtt
     }
 
 
-
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         exception = (Exception) cause;
-        if (CicadaException.isResetByPeer(cause.getMessage())){
+        if (CicadaException.isResetByPeer(cause.getMessage())) {
             return;
         }
 
-        if (exceptionHandle != null){
-            exceptionHandle.resolveException(CicadaContext.getContext(),exception);
+        if (exceptionHandle != null) {
+            exceptionHandle.resolveException(CicadaContext.getContext(), exception);
         }
     }
 
@@ -163,14 +132,13 @@ public final class HttpDispatcher extends SimpleChannelInboundHandler<DefaultHtt
      */
     private void buildHeader(DefaultFullHttpResponse response) {
         CicadaResponse cicadaResponse = CicadaContext.getResponse();
-
         HttpHeaders headers = response.headers();
         headers.setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         headers.set(HttpHeaderNames.CONTENT_TYPE, cicadaResponse.getContentType());
 
         List<Cookie> cookies = cicadaResponse.cookies();
         for (Cookie cookie : cookies) {
-            headers.add(CicadaConstant.ContentType.SET_COOKIE, io.netty.handler.codec.http.cookie.ServerCookieEncoder.LAX.encode(cookie));
+            headers.add(CicadaConstant.ContentType.SET_COOKIE, LAX.encode(cookie));
         }
 
     }

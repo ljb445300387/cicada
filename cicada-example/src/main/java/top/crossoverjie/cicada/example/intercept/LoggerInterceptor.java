@@ -1,5 +1,6 @@
 package top.crossoverjie.cicada.example.intercept;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import top.crossoverjie.cicada.base.log.LoggerBuilder;
 import top.crossoverjie.cicada.server.action.param.Param;
@@ -14,11 +15,9 @@ import top.crossoverjie.cicada.server.intercept.BaseCicadaInterceptor;
  *         Date: 2018/9/2 14:39
  * @since JDK 1.8
  */
+@Slf4j
 @Interceptor(order = 1)
-public class LoggerInterceptorBase extends BaseCicadaInterceptor {
-
-    private static final Logger LOGGER = LoggerBuilder.getLogger(LoggerInterceptorBase.class) ;
-
+public class LoggerInterceptor extends BaseCicadaInterceptor {
     @Override
     public boolean before(CicadaContext context, Param param) throws Exception {
         return super.before(context, param);
@@ -26,6 +25,6 @@ public class LoggerInterceptorBase extends BaseCicadaInterceptor {
 
     @Override
     public void after(CicadaContext context, Param param) {
-        LOGGER.info("logger param=[{}]",param.toString());
+        log.info("logger param=[{}]",param.toString());
     }
 }

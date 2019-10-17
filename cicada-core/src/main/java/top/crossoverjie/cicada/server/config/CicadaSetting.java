@@ -28,29 +28,13 @@ import static top.crossoverjie.cicada.server.constant.CicadaConstant.SystemPrope
  * @since JDK 1.8
  */
 public final class CicadaSetting {
-
-    /**
-     * @param clazz
-     * @param rootPath
-     * @throws Exception
-     */
     public static void setting(Class<?> clazz, String rootPath) throws Exception {
-        //Initialize the application configuration
         initConfiguration(clazz);
-
         //Set application configuration
         setAppConfig(rootPath);
-
         //initBean route bean factory
         CicadaBeanManager.getInstance().initBean(rootPath);
     }
-
-
-    private static void logo() {
-        System.out.println(LOGO);
-        Thread.currentThread().setName(APPLICATION_THREAD_MAIN_NAME);
-    }
-
 
     /**
      * Set application configuration
@@ -63,11 +47,11 @@ public final class CicadaSetting {
         if (rootPath == null) {
             rootPath = applicationConfiguration.get(CicadaConstant.ROOT_PATH);
         }
-        String port = applicationConfiguration.get(CicadaConstant.CICADA_PORT);
 
         if (rootPath == null) {
             throw new CicadaException("No [cicada.root.path] exists ");
         }
+        String port = applicationConfiguration.get(CicadaConstant.CICADA_PORT);
         if (port == null) {
             throw new CicadaException("No [cicada.port] exists ");
         }
@@ -102,7 +86,6 @@ public final class CicadaSetting {
             Properties properties = new Properties();
             properties.load(stream);
             conf.setProperties(properties);
-
             // add configuration cache
             ConfigurationHolder.addConfiguration(aClass.getName(), conf);
         }

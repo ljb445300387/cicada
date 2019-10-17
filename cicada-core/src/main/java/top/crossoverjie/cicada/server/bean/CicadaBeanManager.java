@@ -21,20 +21,13 @@ public final class CicadaBeanManager {
     private CicadaBeanManager() {
     }
 
-    private static volatile CicadaBeanManager cicadaBeanManager;
+    private static volatile CicadaBeanManager cicadaBeanManager = new CicadaBeanManager();
 
     private static CicadaBeanFactory cicadaBeanFactory;
 
     private GlobalHandelException handelException;
 
     public static CicadaBeanManager getInstance() {
-        if (cicadaBeanManager == null) {
-            synchronized (CicadaBeanManager.class) {
-                if (cicadaBeanManager == null) {
-                    cicadaBeanManager = new CicadaBeanManager();
-                }
-            }
-        }
         return cicadaBeanManager;
     }
 

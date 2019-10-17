@@ -1,5 +1,6 @@
 package top.crossoverjie.cicada.bean.ioc;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import top.crossoverjie.cicada.base.bean.CicadaBeanFactory;
 import top.crossoverjie.cicada.base.log.LoggerBuilder;
@@ -11,18 +12,16 @@ import java.util.Map;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/11/14 01:14
+ * Date: 2018/11/14 01:14
  * @since JDK 1.8
  */
+@Slf4j
 public class CicadaIoc implements CicadaBeanFactory {
-
-    private static final Logger LOGGER = LoggerBuilder.getLogger(CicadaIoc.class) ;
-
-    private static Map<String,Object> beans = new HashMap<>(16) ;
+    private static Map<String, Object> beans = new HashMap<>(16);
 
     @Override
     public void register(Object object) {
-        beans.put(object.getClass().getName(),object) ;
+        beans.put(object.getClass().getName(), object);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class CicadaIoc implements CicadaBeanFactory {
 
     @Override
     public void releaseBean() {
-        beans = null ;
-        LOGGER.info("release all bean success.");
+        beans = null;
+        log.info("release all bean success.");
     }
 }

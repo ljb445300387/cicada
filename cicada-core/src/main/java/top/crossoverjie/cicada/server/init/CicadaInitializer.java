@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import top.crossoverjie.cicada.server.handle.HttpDispatcher;
+import top.crossoverjie.cicada.server.handle.HttpDispatcherHandler;
 
 /**
  * Function:
@@ -17,7 +17,7 @@ import top.crossoverjie.cicada.server.handle.HttpDispatcher;
  * @since JDK 1.8
  */
 public class CicadaInitializer extends ChannelInitializer<Channel> {
-    private final HttpDispatcher httpDispatcher = new HttpDispatcher() ;
+    private final HttpDispatcherHandler httpDispatcherHandler = new HttpDispatcherHandler() ;
 
     @Override
     public void initChannel(Channel ch) throws Exception {
@@ -25,7 +25,7 @@ public class CicadaInitializer extends ChannelInitializer<Channel> {
                 .addLast(new HttpRequestDecoder())
                 .addLast(new HttpResponseEncoder())
                 .addLast(new ChunkedWriteHandler())
-                .addLast(httpDispatcher)
+                .addLast(httpDispatcherHandler)
                 .addLast("logging", new LoggingHandler(LogLevel.INFO));
     }
 }

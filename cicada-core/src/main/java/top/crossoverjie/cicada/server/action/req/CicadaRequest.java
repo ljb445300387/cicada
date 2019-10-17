@@ -4,29 +4,15 @@ package top.crossoverjie.cicada.server.action.req;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/10/5 00:40
+ * Date: 2018/10/5 00:40
  * @since JDK 1.8
  */
 public interface CicadaRequest {
 
-    /**
-     * get request method
-     * @return
-     */
-    String getMethod() ;
+    String getMethod();
 
-    /**
-     * get request url
-     * @return
-     */
-    String getUrl() ;
+    String getUrl();
 
-    /**
-     * get cookie by key
-     * @param key
-     * @return return cookie by key
-     */
-    Cookie getCookie(String key) ;
-
+    Cookie getCookie(String key);
 
 }

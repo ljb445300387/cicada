@@ -35,13 +35,8 @@ public class NettyBootStrap {
     private static Channel channel;
 
     public static void startCicada() throws Exception {
-        // start
         startServer();
-
-        // register shutdown hook
         shutDownServer();
-
-        // synchronized channel
         joinServer();
     }
 

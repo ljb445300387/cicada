@@ -1,5 +1,6 @@
 package top.crossoverjie.cicada.example.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import top.crossoverjie.cicada.base.log.LoggerBuilder;
 import top.crossoverjie.cicada.server.action.res.WorkRes;
@@ -16,15 +17,11 @@ import top.crossoverjie.cicada.server.exception.GlobalHandelException;
  */
 
 @CicadaBean
+@Slf4j
 public class ExceptionHandle implements GlobalHandelException {
-    private final static Logger LOGGER = LoggerBuilder.getLogger(ExceptionHandle.class);
-
     @Override
     public void resolveException(CicadaContext context, Exception e) {
-        LOGGER.error("Exception", e);
-        WorkRes workRes = new WorkRes();
-        workRes.setCode("500");
-        workRes.setMessage(e.getClass().getName() + "系统运行出现异常");
-        context.json(workRes);
+        log.error("Exception", e);
+        context.json(new WorkRes().setCode("500").setMessage(e.getClass().getName() + "系统运行出现异常"));
     }
 }

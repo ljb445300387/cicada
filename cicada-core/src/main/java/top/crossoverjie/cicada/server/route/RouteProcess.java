@@ -16,42 +16,36 @@ import java.util.Map;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/11/13 21:18
+ * Date: 2018/11/13 21:18
  * @since JDK 1.8
  */
 public final class RouteProcess {
 
-    private volatile static RouteProcess routeProcess;
+    private volatile static RouteProcess routeProcess = new RouteProcess();
 
-    private final CicadaBeanManager cicadaBeanManager = CicadaBeanManager.getInstance() ;
+    private final CicadaBeanManager cicadaBeanManager = CicadaBeanManager.getInstance();
 
     public static RouteProcess getInstance() {
-        if (routeProcess == null) {
-            synchronized (RouteProcess.class) {
-                if (routeProcess == null) {
-                    routeProcess = new RouteProcess();
-                }
-            }
-        }
         return routeProcess;
     }
 
     /**
      * invoke route method
+     *
      * @param method
      * @param queryStringDecoder
      * @throws Exception
      */
     public void invoke(Method method, QueryStringDecoder queryStringDecoder) throws Exception {
-        if (method == null){
+        if (method == null) {
             return;
         }
 
         Object[] object = parseRouteParameter(method, queryStringDecoder);
         Object bean = cicadaBeanManager.getBean(method.getDeclaringClass().getName());
-        if (object == null){
-            method.invoke(bean) ;
-        }else {
+        if (object == null) {
+            method.invoke(bean);
+        } else {
             method.invoke(bean, object);
         }
     }
@@ -69,7 +63,7 @@ public final class RouteProcess {
     private Object[] parseRouteParameter(Method method, QueryStringDecoder queryStringDecoder) throws IllegalAccessException, InstantiationException, NoSuchFieldException {
         Class<?>[] parameterTypes = method.getParameterTypes();
 
-        if (parameterTypes.length == 0){
+        if (parameterTypes.length == 0) {
             return null;
         }
 
@@ -77,25 +71,25 @@ public final class RouteProcess {
             throw new CicadaException(StatusEnum.ILLEGAL_PARAMETER);
         }
 
-        Object[] instances = new Object[parameterTypes.length] ;
+        Object[] instances = new Object[parameterTypes.length];
 
         for (int i = 0; i < instances.length; i++) {
             //inject cicada context instance
-            if (parameterTypes[i] == CicadaContext.class){
-                instances[i] = CicadaContext.getContext() ;
-            }else {
-                //inject custom pojo
-                Class<?> parameterType = parameterTypes[i];
-                Object instance = parameterType.newInstance();
-
-                Map<String, List<String>> parameters = queryStringDecoder.parameters();
-                for (Map.Entry<String, List<String>> param : parameters.entrySet()) {
-                    Field field = parameterType.getDeclaredField(param.getKey());
-                    field.setAccessible(true);
-                    field.set(instance, parseFieldValue(field, param.getValue().get(0)));
-                }
-                instances[i] = instance ;
+            if (parameterTypes[i] == CicadaContext.class) {
+                instances[i] = CicadaContext.getContext();
+                continue;
             }
+            //inject custom pojo
+            Class<?> parameterType = parameterTypes[i];
+            Object instance = parameterType.newInstance();
+
+            Map<String, List<String>> parameters = queryStringDecoder.parameters();
+            for (Map.Entry<String, List<String>> param : parameters.entrySet()) {
+                Field field = parameterType.getDeclaredField(param.getKey());
+                field.setAccessible(true);
+                field.set(instance, parseFieldValue(field, param.getValue().get(0)));
+            }
+            instances[i] = instance;
         }
 
         return instances;

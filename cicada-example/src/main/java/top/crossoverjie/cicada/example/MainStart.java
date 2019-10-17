@@ -6,12 +6,12 @@ import top.crossoverjie.cicada.server.CicadaServer;
  * Function:
  *
  * @author crossoverJie
- *         Date: 2018/8/31 16:27
+ * Date: 2018/8/31 16:27
  * @since JDK 1.8
  */
 public class MainStart {
 
     public static void main(String[] args) throws Exception {
-        CicadaServer.start(MainStart.class,"/cicada-example") ;
+        CicadaServer.start(MainStart.class);
     }
 }
